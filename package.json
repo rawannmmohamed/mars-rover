@@ -1,0 +1,15 @@
+{
+  "name": "mars-rover",
+  "version": "1.0.0",
+  "description": "Mars Rover coding challenge ",
+  "main": "src/rover.js",
+  "scripts": {
+    "test": "jest --coverage",
+    "test:watch": "jest --watchAll"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "type": "commonjs"
+}
+
