@@ -1,5 +1,5 @@
 /**
- * Handles movement and directions
+ * Handles rover movement, direction changes and obstacles
  */
 
 const DIRECTIONS = ['NORTH', 'EAST', 'SOUTH', 'WEST'];
@@ -12,10 +12,13 @@ const VECTORS = {
 };
 
 class Rover {
-    constructor(x = 0, y = 0, heading = 'NORTH') {
+    constructor(x = 0, y = 0, heading = 'NORTH', obstacles = []) {
         this.x = x;
         this.y = y;
         this.heading = heading.toUpperCase();
+
+        this.obstacles = new Set(obstacles.map(([ox, oy]) => `${ox},${oy}`));
+        this.stopped = false;
 
         this.dirIndex = DIRECTIONS.indexOf(this.heading);
         if (this.dirIndex === -1) {
@@ -31,21 +34,28 @@ class Rover {
             R: () => this._turn(1),
         };
 
-        for (const ch of commands.toUpperCase()) {
-            const handler = handlers[ch];
-            if (!handler) {
-                throw new Error(`Invalid command: ${ch}`);
-            }
+        for (const command of commands.toUpperCase()) {
+            const handler = handlers[command];
+            if (!handler) throw new Error(`Invalid command: ${command}`);
             handler();
+            if (this.stopped) return this.report();
         }
 
         return this.report();
     }
 
-    _move(mult) {
+    _move(step) {
         const [dx, dy] = VECTORS[this.heading];
-        this.x += dx * mult;
-        this.y += dy * mult;
+        const nextX = this.x + dx * step;
+        const nextY = this.y + dy * step;
+
+        if (this.hasObstacle(nextX, nextY)) {
+            this.stopped = true;
+            return;
+        }
+
+        this.x = nextX;
+        this.y = nextY;
     }
 
     _turn(step) {
@@ -53,8 +63,13 @@ class Rover {
         this.heading = DIRECTIONS[this.dirIndex];
     }
 
+    hasObstacle(x, y) {
+        return this.obstacles.has(`${x},${y}`);
+    }
+
     report() {
-        return `(${this.x}, ${this.y}) ${this.heading}`;
+        const result = `(${this.x}, ${this.y}) ${this.heading}`;
+        return this.stopped ? `${result} STOPPED` : result;
     }
 }
 

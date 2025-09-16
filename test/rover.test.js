@@ -32,4 +32,14 @@ describe('Mars Rover', () => {
         const r = new Rover(0, 0, 'NORTH');
         expect(() => r.executeCommands('FX')).toThrow(/Invalid command/);
     });
+    test('stops before obstacle and returns STOPPED', () => {
+        const r = new Rover(0, 0, 'EAST', [[2, 0]]);
+        expect(r.executeCommands('FFF')).toBe('(1, 0) EAST STOPPED');
+    });
+
+    test('immediate obstacle: stops at start and reports STOPPED', () => {
+        const r = new Rover(0, 0, 'EAST', [[1, 0]]);
+        expect(r.executeCommands('F')).toBe('(0, 0) EAST STOPPED');
+    });
+
 });
